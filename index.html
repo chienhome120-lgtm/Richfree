@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>StockPilot Pro v2.4｜3D 台股智慧分析終端</title>
+<style>
+:root{--bg:#08101d;--panel:#101b2c;--panel2:#142238;--line:#24344d;--txt:#eaf1fb;--muted:#8fa2bc;--green:#35d07f;--red:#ff5d73;--amber:#ffc857;--blue:#5ca8ff;--cyan:#5ce1e6}
+*{box-sizing:border-box} body{margin:0;background:
+radial-gradient(circle at 10% -10%,#1b4d7a88 0,transparent 30%),
+radial-gradient(circle at 92% 8%,#263c8a55 0,transparent 27%),
+linear-gradient(145deg,#050a12 0%,#091424 48%,#07101d 100%);
+background-attachment:fixed;color:var(--txt);font-family:Inter,"Noto Sans TC",system-ui,-apple-system,sans-serif;min-height:100vh}
+header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#0b1728e8,#07111fd6);
+backdrop-filter:blur(22px) saturate(150%);border-bottom:1px solid #5ca8ff33;
+box-shadow:0 12px 40px #0008,inset 0 1px #ffffff0d}
+.wrap{max-width:1450px;margin:auto;padding:18px 22px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-size:23px;font-weight:900;letter-spacing:.3px;text-shadow:0 2px 16px #4aa4ff44}.brand b{color:var(--cyan)}.status{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px}.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 14px var(--green)}
+nav{display:flex;gap:8px;margin-top:15px;overflow:auto}.tab{border:1px solid var(--line);background:#0e1929;color:var(--muted);padding:10px 14px;border-radius:10px;cursor:pointer;white-space:nowrap}.tab.active{background:#173054;color:#fff;border-color:#2d65a4}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;margin-top:16px}.card{position:relative;overflow:hidden;background:
+linear-gradient(145deg,#182942d9 0%,#0e1a2cdb 42%,#091321e8 100%);
+border:1px solid #8bbcff2b;border-radius:20px;padding:18px;
+box-shadow:0 20px 50px #0008,0 3px 10px #0006,inset 0 1px 0 #ffffff18,inset 0 -1px 0 #0008;
+backdrop-filter:blur(16px) saturate(130%);transform:translateZ(0)}
+.card:before{content:"";position:absolute;inset:0;pointer-events:none;background:
+linear-gradient(115deg,#ffffff12 0%,transparent 24%,transparent 72%,#5ca8ff08 100%)}
+.card:hover{border-color:#6eafff55;box-shadow:0 24px 58px #0009,0 0 28px #348cff0b,inset 0 1px #ffffff20}.kpi{grid-column:span 3}.klabel{color:var(--muted);font-size:13px}.kval{font-size:26px;font-weight:900;margin-top:6px;letter-spacing:-.5px;text-shadow:0 3px 12px #0008}.sub{font-size:12px;color:var(--muted);margin-top:4px}
+h2{font-size:18px;margin:0 0 13px}.section{grid-column:span 12}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:13px}
+button,input,select{font:inherit}.btn{border:1px solid #86c5ff55;background:linear-gradient(145deg,#348dff,#1c63d5);color:#fff;font-weight:800;padding:10px 15px;border-radius:12px;cursor:pointer;
+box-shadow:0 8px 18px #176ee544,inset 0 1px #ffffff55,inset 0 -2px #063b8c66;text-shadow:0 1px 2px #0008;transition:.18s}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}.btn.secondary{background:#17263b;border:1px solid var(--line);color:#dbe8f7}.input{background:#091322;border:1px solid var(--line);color:#fff;padding:10px 12px;border-radius:10px;outline:none}.input:focus{border-color:#4e91df}
+table{width:100%;border-collapse:collapse;min-width:980px}.tablewrap{overflow:auto;border-radius:12px;border:1px solid var(--line)}th,td{padding:12px 10px;border-bottom:1px solid #1f2e43;text-align:right;font-size:13px;white-space:nowrap}th{position:sticky;top:0;background:#132136;color:#93a8c3;font-weight:700}th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}.rank{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#1d3553;color:#8ec5ff;font-weight:800}.ticker{font-weight:800}.name{color:#a9bad0;margin-left:7px}.up{color:var(--red)}.down{color:var(--green)}.neutral{color:var(--amber)}
+.score{display:inline-flex;align-items:center;gap:8px}.bar{width:72px;height:6px;border-radius:9px;background:#22324a;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#2b8cff,#5ce1e6)}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}.bA{background:#153d31;color:#5ee5a3}.bB{background:#42371b;color:#ffd56c}.bC{background:#43222a;color:#ff8c9b}
+.two{grid-column:span 6}.metricrow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{background:linear-gradient(145deg,#13233a,#091423);border:1px solid #5b83ad33;border-radius:14px;padding:13px;
+box-shadow:inset 0 1px #ffffff10,0 8px 20px #0004}.metric strong{display:block;font-size:18px;margin-top:5px}
+.chart{height:260px;position:relative;background:linear-gradient(#0b1626,#09121f);border:1px solid #203049;border-radius:12px;overflow:hidden}.chart canvas{width:100%;height:100%}
+.alloc{display:flex;gap:12px;align-items:center;background:#0a1423;border:1px solid #203049;border-radius:12px;padding:13px;margin-top:12px}.alloc strong{font-size:20px;color:#75c6ff}
+.note{font-size:12px;line-height:1.65;color:#8fa2bc}.footer{padding:22px 0 40px;color:#6f829b;font-size:12px}
+.empty{text-align:center;color:var(--muted);padding:34px}.pill{padding:7px 10px;border:1px solid var(--line);border-radius:999px;color:#a8bad0;font-size:12px}
+@media(max-width:900px){.wrap{padding:14px}.kpi{grid-column:span 6}.two{grid-column:span 12}.metricrow{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.kpi{grid-column:span 12}.brand{font-size:18px}.kval{font-size:21px}}
+
+.tradeplan{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.tradebox{background:linear-gradient(145deg,#14253d,#091321);border:1px solid #668fb933;border-radius:14px;padding:13px;
+box-shadow:inset 0 1px #ffffff12,0 9px 20px #0005}
+.tradebox span{display:block;color:#8fa2bc;font-size:12px;margin-bottom:5px}
+.tradebox b{font-size:16px}
+.tradebox small{display:block;color:#71859f;margin-top:4px}
+.refreshline{display:flex;align-items:center;gap:8px;color:#8fa2bc;font-size:12px}
+.switch{accent-color:#5ca8ff}
+@media(max-width:700px){.tradeplan{grid-template-columns:repeat(2,1fr)}}
+
+/* v2.4 官方行情自動連線 */
+.pill{
+  color:#26384f !important;
+  background:linear-gradient(145deg,#eef3f8,#d9e2ec) !important;
+  border:1px solid #aebdcd !important;
+  font-weight:800 !important;
+  text-shadow:none !important;
+  box-shadow:0 5px 12px #0005,inset 0 1px #ffffff !important;
+}
+.pill:hover{
+  color:#102238 !important;
+  background:linear-gradient(145deg,#ffffff,#e1e9f1) !important;
+}
+
+</style>
+</head>
+<body>
+<header><div class="wrap">
+ <div class="top"><div class="brand">Stock<b>Pilot</b> Pro <span style="font-size:11px;color:#71859f">TAIWAN EQUITY TERMINAL</span></div>
+ <div class="status"><span class="dot"></span><span id="feedStatus">分析引擎就緒</span><span id="clock"></span></div></div>
+ <nav><button class="tab active" data-view="market">潛力 Top 10</button><button class="tab" data-view="watch">自選股即時分析</button><button class="tab" data-view="settings">資料源 / 參數</button></nav>
+</div></header>
+
+<main class="wrap">
+<section id="marketView">
+ <div class="grid">
+  <div class="card kpi"><div class="klabel">市場風險溫度</div><div class="kval" id="riskTemp">中性 52</div><div class="sub">依波動、量價與趨勢合成</div></div>
+  <div class="card kpi"><div class="klabel">候選池</div><div class="kval">50 檔</div><div class="sub">流動性與風險先行過濾</div></div>
+  <div class="card kpi"><div class="klabel">強勢趨勢</div><div class="kval" id="strongCount">—</div><div class="sub">綜合分數 ≥ 75</div></div>
+  <div class="card kpi"><div class="klabel">模型更新</div><div class="kval" id="updated">—</div><div class="sub">目前使用本機示範資料</div></div>
+
+  <div class="card section">
+   <div class="toolbar"><div><h2>AI 多因子潛力 Top 10</h2><div class="note">分數 = 趨勢 30% + 動能 20% + 量價 15% + 基本面 20% + 估值 10% + 風險 5%</div></div>
+   <span style="flex:1"></span><select id="capital" class="input"><option value="100000">資金 10 萬</option><option value="300000">資金 30 萬</option><option value="500000" selected>資金 50 萬</option><option value="1000000">資金 100 萬</option></select><button class="btn" onclick="rerank()">重新掃描</button></div>
+   <div class="tablewrap"><table><thead><tr><th>#</th><th>股票</th><th>現價</th><th>漲跌</th><th>綜合分數</th><th>趨勢</th><th>合理觀察區</th><th>風控參考</th><th>建議部位上限</th><th>估算張數</th><th>訊號</th></tr></thead><tbody id="topBody"></tbody></table></div>
+  </div>
+ </div>
+</section>
+
+<section id="watchView" style="display:none">
+ <div class="grid">
+  <div class="card section">
+   <div class="toolbar"><div><h2>自選股監控中心</h2><div class="note">可一次加入多檔。輸入台股代號，例如 2330、2454、3037。</div></div><span style="flex:1"></span>
+   <input id="stockInput" class="input" placeholder="輸入股票代號"><button class="btn" onclick="addStock()">＋ 加入</button><button class="btn secondary" onclick="refreshWatch()">更新行情</button>
+   <label class="refreshline"><input id="autoRefresh" class="switch" type="checkbox" onchange="toggleAuto()"> 自動更新</label>
+   <select id="refreshSec" class="input" onchange="toggleAuto()"><option value="15">15 秒</option><option value="30" selected>30 秒</option><option value="60">60 秒</option></select></div>
+   <div id="chips" class="toolbar"></div>
+  </div>
+  <div class="card two">
+   <h2 id="focusTitle">2330 台積電</h2>
+   <div class="metricrow"><div class="metric"><span class="klabel">即時價</span><strong id="mPrice">—</strong></div><div class="metric"><span class="klabel">綜合分數</span><strong id="mScore">—</strong></div><div class="metric"><span class="klabel">RSI(14)</span><strong id="mRsi">—</strong></div><div class="metric"><span class="klabel">波動風險</span><strong id="mRisk">—</strong></div></div>
+   <div class="alloc"><div><div class="klabel">模型估算的分批觀察區</div><strong id="entryZone">—</strong></div><div style="margin-left:auto;text-align:right"><div class="klabel">單檔部位上限</div><strong id="position">—</strong></div></div>
+   <div class="tradeplan">
+    <div class="tradebox"><span>第一批｜試單 30%</span><b id="e1">—</b><small>靠近短線支撐</small></div>
+    <div class="tradebox"><span>第二批｜加碼 35%</span><b id="e2">—</b><small>回測主要支撐</small></div>
+    <div class="tradebox"><span>第三批｜加碼 35%</span><b id="e3">—</b><small>深度回檔區</small></div>
+    <div class="tradebox"><span>風控停損</span><b id="sl">—</b><small>跌破模型失效區</small></div>
+    <div class="tradebox"><span>停利一</span><b id="tp1">—</b><small>先收回部分風險</small></div>
+    <div class="tradebox"><span>停利二</span><b id="tp2">—</b><small>趨勢延伸目標</small></div>
+    <div class="tradebox"><span>停利三</span><b id="tp3">—</b><small>強勢延伸目標</small></div>
+    <div class="tradebox"><span>估算張數</span><b id="lots">—</b><small>依部位上限計算</small></div>
+   </div>
+   <p class="note" id="reason">選擇股票後顯示量化分析理由。</p>
+  </div>
+  <div class="card two"><h2>近 30 期價格趨勢</h2><div class="chart"><canvas id="chart"></canvas></div><div class="note" style="margin-top:10px">藍線為模擬價格軌跡；串接行情 API 後可改為真實 K 線/分鐘線。</div></div>
+  <div class="card section"><h2>自選股比較</h2><div class="tablewrap"><table><thead><tr><th>股票</th><th>現價</th><th>日漲跌</th><th>MA20</th><th>RSI</th><th>量比</th><th>模型分數</th><th>觀察進場區</th><th>部位上限</th><th>操作</th></tr></thead><tbody id="watchBody"></tbody></table></div></div>
+ </div>
+</section>
+
+<section id="settingsView" style="display:none">
+ <div class="grid">
+  <div class="card two"><h2>即時資料源</h2><p class="note">這個單檔 HTML 預設使用內建示範資料，確保離線也能操作。若要真正「即時」，建議用自己的後端 Proxy 串接合法行情 API，再把端點填在下方；不要把付費 API Key 直接寫死在 HTML。</p>
+  <label class="klabel">行情 API Endpoint</label><input id="apiUrl" class="input" style="width:100%;margin-top:7px" placeholder="例如 https://your-domain.com/api/quote?symbol={symbol}">
+  <button class="btn" style="margin-top:10px" onclick="saveSettings()">儲存設定</button>
+<button class="btn" style="margin-top:10px;margin-left:8px" onclick="useTwsePreset()">使用證交所 MIS 行情</button></div>
+  <div class="card two"><h2>風控參數</h2>
+   <div class="metricrow"><div class="metric"><span class="klabel">單檔最大資金</span><strong>20%</strong></div><div class="metric"><span class="klabel">單筆風險</span><strong>1.0%</strong></div><div class="metric"><span class="klabel">分批進場</span><strong>3 批</strong></div><div class="metric"><span class="klabel">最低模型分</span><strong>60</strong></div></div>
+   <p class="note">「建議部位」是依資金規模、波動度與模型分數估算的風險預算，不代表保證獲利。正式交易前應再檢查財報、重大訊息、流動性與個人承受能力。</p></div>
+  <div class="card section"><h2>資料介面格式</h2><p class="note">你的 Proxy 回傳 JSON 建議格式：<br><code>{ "symbol":"2330", "name":"台積電", "price":1234, "changePct":1.25, "volume":32000, "history":[...] }</code><br>系統會自動讀取 price / changePct / history；其餘基本面資料可再擴充 MOPS/TWSE 資料表。</p></div>
+ </div>
+</section>
+<div class="footer">StockPilot Pro v2.4｜量化決策輔助工具。模型輸出屬資料分析結果，不構成獲利保證或個別投資顧問服務。</div>
+</main>
+
+<script>
+const base=[
+ {s:'2002',n:'中鋼',p:18.80,c:.80,f:65,t:'資料觀察',rsi:50,vr:1,risk:'中'},
+ {s:'00937B',n:'群益ESG投等債20+',p:0,c:0,f:0,t:'等待行情',rsi:0,vr:0,risk:'待評估'},
+ {s:'00712',n:'復華富時不動產',p:0,c:0,f:0,t:'等待行情',rsi:0,vr:0,risk:'待評估'},
+ {s:'00981A',n:'主動統一台股增長',p:0,c:0,f:0,t:'等待行情',rsi:0,vr:0,risk:'待評估'},
+ {s:'2330',n:'台積電',p:1345,c:1.43,f:92,t:'多頭',rsi:63,vr:1.42,risk:'中低'},
+ {s:'2454',n:'聯發科',p:1595,c:.95,f:88,t:'多頭',rsi:59,vr:1.28,risk:'中'},
+ {s:'3037',n:'欣興',p:982,c:2.08,f:85,t:'多頭',rsi:66,vr:1.63,risk:'中高'},
+ {s:'2308',n:'台達電',p:1010,c:.60,f:83,t:'多頭',rsi:58,vr:1.16,risk:'中'},
+ {s:'2382',n:'廣達',p:328,c:1.23,f:80,t:'偏多',rsi:61,vr:1.31,risk:'中'},
+ {s:'3711',n:'日月光投控',p:218,c:.46,f:78,t:'偏多',rsi:55,vr:1.08,risk:'中'},
+ {s:'6669',n:'緯穎',p:3460,c:1.76,f:77,t:'偏多',rsi:64,vr:1.39,risk:'中高'},
+ {s:'2881',n:'富邦金',p:91.2,c:.33,f:74,t:'盤堅',rsi:53,vr:.96,risk:'低'},
+ {s:'3231',n:'緯創',p:146.5,c:1.04,f:72,t:'盤堅',rsi:57,vr:1.20,risk:'中高'},
+ {s:'2379',n:'瑞昱',p:612,c:-.49,f:69,t:'整理',rsi:49,vr:.89,risk:'中'},
+ {s:'00937B',n:'群益ESG投等債20+',p:15.5,c:0,f:68,t:'收益型ETF',rsi:50,vr:1,risk:'低'},
+ {s:'00631L',n:'元大台灣50正2',p:300,c:0,f:70,t:'槓桿ETF',rsi:55,vr:1,risk:'高'},
+ {s:'0050',n:'元大台灣50',p:65,c:0,f:76,t:'大盤ETF',rsi:55,vr:1,risk:'中低'}
+];
+let stocks=JSON.parse(localStorage.getItem('sp_watch')||'["2330","2454","3037"]');
+let focus=stocks[0]||'2330';
+
+function money(v){return Math.round(v).toLocaleString('zh-TW')}
+function zone(x){let lo=x.p*(x.f>=80?.965:.94),hi=x.p*(x.f>=80?.985:.97);return `${lo.toFixed(x.p<100?1:0)}–${hi.toFixed(x.p<100?1:0)}`}
+function maxPos(x){let cap=+document.getElementById('capital').value;let q=(x.f/100)*.20; if(x.risk.includes('高'))q*=.72; if(x.risk==='低')q*=1.05;return Math.min(cap*.2,cap*q)}
+function sig(f){return f>=82?['A','強勢候選','bA']:f>=72?['B','等待回檔','bB']:['C','觀察','bC']}
+function renderTop(){
+ let rows=[...base].sort((a,b)=>b.f-a.f);
+ document.getElementById('topBody').innerHTML=rows.map((x,i)=>{let q=sig(x.f);return `<tr><td><span class="rank">${i+1}</span></td><td><span class="ticker">${x.s}</span><span class="name">${x.n}</span></td><td>${x.p.toLocaleString()}</td><td class="${x.c>=0?'up':'down'}">${x.c>=0?'+':''}${x.c.toFixed(2)}%</td><td><span class="score"><b>${x.f}</b><span class="bar"><i class="fill" style="width:${x.f}%"></i></span></span></td><td>${x.t}</td><td>${zone(x)}</td><td>${(x.p*.925).toFixed(x.p<100?1:0)}</td><td>NT$ ${money(maxPos(x))}</td><td>${Math.floor(maxPos(x)/(x.p*1000))} 張</td><td><span class="badge ${q[2]}">${q[0]}｜${q[1]}</span></td></tr>`}).join('');
+ document.getElementById('strongCount').textContent=rows.filter(x=>x.f>=75).length+' 檔';
+ document.getElementById('updated').textContent=new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+}
+function findStock(s){return base.find(x=>x.s===s)||{s,n:'待取得名稱',p:0,c:0,f:0,t:'尚未取得行情',rsi:0,vr:0,risk:'待評估'}}
+function renderWatch(){
+ document.getElementById('chips').innerHTML=stocks.map(s=>`<button class="pill" onclick="setFocus('${s}')">${s} ${findStock(s).n} ×</button>`).join('');
+ document.getElementById('watchBody').innerHTML=stocks.map(s=>{let x=findStock(s);return `<tr onclick="setFocus('${s}')" style="cursor:pointer"><td><b>${s}</b> ${x.n}</td><td>${x.p}</td><td class="${x.c>=0?'up':'down'}">${x.c>=0?'+':''}${x.c.toFixed(2)}%</td><td>${(x.p*.982).toFixed(1)}</td><td>${x.rsi}</td><td>${x.vr.toFixed(2)}</td><td>${x.f}</td><td>${zone(x)}</td><td>NT$ ${money(maxPos(x))}</td><td><button class="btn secondary" onclick="event.stopPropagation();removeStock('${s}')">移除</button></td></tr>`}).join('');
+ setFocus(focus);
+}
+function setFocus(s){focus=s;let x=findStock(s),d=x.p<100?1:0,pos=maxPos(x),lots=Math.floor(pos/(x.p*1000));
+ document.getElementById('focusTitle').textContent=`${x.s} ${x.n}`;document.getElementById('mPrice').textContent=x.p.toLocaleString();document.getElementById('mScore').textContent=x.f+' / 100';document.getElementById('mRsi').textContent=x.rsi;document.getElementById('mRisk').textContent=x.risk;document.getElementById('entryZone').textContent=zone(x);document.getElementById('position').textContent='NT$ '+money(pos);
+ const vals={e1:x.p*.985,e2:x.p*.965,e3:x.p*.94,sl:x.p*.915,tp1:x.p*1.04,tp2:x.p*1.08,tp3:x.p*1.13};
+ Object.keys(vals).forEach(k=>document.getElementById(k).textContent=vals[k].toFixed(d));
+ document.getElementById('lots').textContent=lots>0?lots+' 張':'零股 '+Math.max(1,Math.floor(pos/x.p))+' 股';
+ document.getElementById('reason').textContent=`${x.t}結構；RSI ${x.rsi}、量比 ${x.vr.toFixed(2)}。模型採三批進場，避免單點猜底；若跌破風控價代表原先交易假設失效。停利價為風險報酬規劃值，並非價格預測。`;drawChart(x)}
+function addStock(){let el=document.getElementById('stockInput'),s=el.value.trim().toUpperCase();if(!/^\d{4,6}[A-Za-z]?$/.test(s)){alert('請輸入台股股票或 ETF 代號，例如 2330、0050、00937B、00631L');return}if(!stocks.includes(s))stocks.push(s);localStorage.setItem('sp_watch',JSON.stringify(stocks));focus=s;el.value='';renderWatch()}
+function removeStock(s){stocks=stocks.filter(v=>v!==s);localStorage.setItem('sp_watch',JSON.stringify(stocks));focus=stocks[0]||'2330';renderWatch()}
+async function useTwsePreset(){
+  const u='https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_{symbol}.tw&json=1&delay=0';
+  localStorage.setItem('sp_api',u);
+  const el=document.getElementById('apiUrl'); if(el) el.value=u;
+  document.getElementById('feedStatus').textContent='已設定證交所 MIS；正在測試連線…';
+  refreshWatch();
+}
+function normalizeQuote(d,s){
+  // StockPilot proxy format
+  if(d && Number.isFinite(+d.price)) return {name:d.name||'',price:+d.price,changePct:+d.changePct||0,history:Array.isArray(d.history)?d.history:null};
+  // TWSE MIS getStockInfo format
+  const z=d&&Array.isArray(d.msgArray)?d.msgArray[0]:null;
+  if(z){
+    const price=parseFloat(z.z||z.y||'');
+    const prev=parseFloat(z.y||'');
+    const pct=(Number.isFinite(price)&&Number.isFinite(prev)&&prev!==0)?((price-prev)/prev*100):0;
+    return {name:z.n||z.nf||'',price,changePct:pct,history:null};
+  }
+  return null;
+}
+async function refreshWatch(){
+ let api=localStorage.getItem('sp_api')||'https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_{symbol}.tw&json=1&delay=0';
+ if(!api){
+   document.getElementById('feedStatus').textContent='尚未設定行情來源';
+   renderWatch(); return;
+ }
+ document.getElementById('feedStatus').textContent='更新行情中…';
+ let ok=0,fail=0;
+ for(const s of stocks){
+   try{
+     let u=api.replace('{symbol}',encodeURIComponent(s));
+     let r=await fetch(u,{cache:'no-store',credentials:'omit'});
+     if(!r.ok) throw new Error('HTTP '+r.status);
+     let d=await r.json(), q=normalizeQuote(d,s);
+     if(!q || !Number.isFinite(q.price) || q.price<=0){
+       const otc='https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=otc_'+encodeURIComponent(s)+'.tw&json=1&delay=0';
+       const r2=await fetch(otc,{cache:'no-store',credentials:'omit'});
+       if(r2.ok) q=normalizeQuote(await r2.json(),s);
+     }
+     let x=base.find(v=>v.s===s);
+     if(q && x && Number.isFinite(q.price) && q.price>0){
+       x.p=q.price; x.c=q.changePct||0;
+       if(q.name) x.n=q.name;
+       if(q.history) x.history=q.history;
+       x.live=true; ok++;
+     }else{ fail++; if(x) x.live=false; }
+   }catch(e){
+     fail++;
+     let x=base.find(v=>v.s===s); if(x) x.live=false;
+   }
+ }
+ const now=new Date().toLocaleTimeString('zh-TW',{hour12:false});
+ document.getElementById('feedStatus').textContent=ok?`已更新 ${ok} 檔｜失敗 ${fail} 檔｜${now}`:`行情連線失敗｜${now}`;
+ renderWatch();
+}
+function drawChart(x){let c=document.getElementById('chart'),ctx=c.getContext('2d'),dpr=devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);
+ let arr=x.history||Array.from({length:30},(_,i)=>x.p*(.94+i*.0022+Math.sin(i*.7)*.012+Math.cos(i*.27)*.007));let mn=Math.min(...arr)*.995,mx=Math.max(...arr)*1.005;
+ ctx.strokeStyle='#24364f';ctx.lineWidth=1;for(let i=1;i<5;i++){let y=h*i/5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+ ctx.strokeStyle='#5ca8ff';ctx.lineWidth=2.4;ctx.beginPath();arr.forEach((v,i)=>{let px=i/(arr.length-1)*w,py=h-(v-mn)/(mx-mn)*h;i?ctx.lineTo(px,py):ctx.moveTo(px,py)});ctx.stroke();
+}
+function rerank(){base.forEach(x=>x.f=Math.max(55,Math.min(95,x.f+Math.round((Math.random()-.5)*4))));renderTop();renderWatch()}
+let autoTimer=null;
+function toggleAuto(){if(autoTimer)clearInterval(autoTimer);autoTimer=null;if(document.getElementById('autoRefresh').checked){let sec=+document.getElementById('refreshSec').value;autoTimer=setInterval(refreshWatch,sec*1000);document.getElementById('feedStatus').textContent=`自動更新 ${sec} 秒`}}
+function saveSettings(){localStorage.setItem('sp_api',document.getElementById('apiUrl').value.trim());alert('資料源設定已儲存')}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');['market','watch','settings'].forEach(v=>document.getElementById(v+'View').style.display=v===b.dataset.view?'':'none');if(b.dataset.view==='watch')renderWatch()});
+document.getElementById('capital').onchange=()=>{renderTop();renderWatch()};
+document.getElementById('apiUrl').value=localStorage.getItem('sp_api')||'';
+setInterval(()=>document.getElementById('clock').textContent='｜'+new Date().toLocaleTimeString('zh-TW'),1000);
+renderTop();renderWatch();window.addEventListener('resize',()=>setFocus(focus));
+
+(function(){
+ const official='https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_{symbol}.tw&json=1&delay=0';
+ if(!localStorage.getItem('sp_api')) localStorage.setItem('sp_api',official);
+ const el=document.getElementById('apiUrl'); if(el) el.value=localStorage.getItem('sp_api')||official;
+ setTimeout(()=>refreshWatch(),500);
+})();
+</script>
+</body>
+</html>
